@@ -156,9 +156,15 @@ function skipQuestion() {
 
 // Function to end the game
 function endGame() {
+    // Stop the timer
     clearInterval(timerInterval);
+    
     const endTime = new Date();
     const timeTaken = roundTimeToNearestSecond((endTime - startTime) / 1000);
+    
+    // Hide the status display
+    document.getElementById('status').style.display = 'none';
+    
     document.getElementById('score').innerText = `You scored ${score} out of 10.`;
     document.getElementById('time').innerText = `Time taken: ${timeTaken} seconds.`;
     document.getElementById('game').style.display = 'none';
@@ -171,9 +177,6 @@ function endGame() {
 
     // Update chart
     updateChart();
-
-    // Stop the timer
-    clearInterval(timerInterval);
 }
 
 // Function to start the game
@@ -183,6 +186,10 @@ function startGame() {
     currentQuestion = 0;
     score = 0;
     startTime = new Date();
+    
+    // Show the status display
+    document.getElementById('status').style.display = 'block';
+    
     generateQuestions();
     displayQuestion();
     document.getElementById('game').style.display = 'block';
