@@ -65,6 +65,8 @@ function checkAnswer() {
     } else {
         endGame();
     }
+    // Automatically select the input box after submitting an answer
+    document.getElementById('answer').focus();
 }
 
 // Function to end the game
