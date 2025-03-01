@@ -40,8 +40,11 @@ function updateScore() {
 
 function checkAnswer() {
     const userAnswer = parseInt(document.getElementById('answer').value);
-    if (userAnswer === questions[currentQuestion].answer) {
+    const correctAnswer = questions[currentQuestion].answer;
+    if (userAnswer === correctAnswer) {
         score++;
+    } else {
+        alert(`Incorrect! The correct answer is ${correctAnswer}.`);
     }
     currentQuestion++;
     document.getElementById('answer').value = '';
