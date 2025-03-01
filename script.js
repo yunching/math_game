@@ -11,17 +11,73 @@ let timerInterval;
 // Chart instance for displaying the score history
 let chartInstance;
 
-// Function to generate multiplication questions
+// Function to generate questions based on settings
 function generateQuestions() {
     console.log('Generating questions...'); // Debugging line
+    const additionEnabled = document.getElementById('addition').checked;
+    const subtractionEnabled = document.getElementById('subtraction').checked;
+    const multiplicationEnabled = document.getElementById('multiplication').checked;
+    const divisionEnabled = document.getElementById('division').checked;
+
+    const additionMin = parseInt(document.getElementById('additionMin').value);
+    const additionMax = parseInt(document.getElementById('additionMax').value);
+    const subtractionMin = parseInt(document.getElementById('subtractionMin').value);
+    const subtractionMax = parseInt(document.getElementById('subtractionMax').value);
+    const multiplicationMin = parseInt(document.getElementById('multiplicationMin').value);
+    const multiplicationMax = parseInt(document.getElementById('multiplicationMax').value);
+    const divisionMin = parseInt(document.getElementById('divisionMin').value);
+    const divisionMax = parseInt(document.getElementById('divisionMax').value);
+    const divisionDecimalPlace = parseInt(document.getElementById('divisionDecimalPlace').value);
+
+    const additionLargerFirst = document.getElementById('additionLargerFirst').checked;
+    const subtractionLargerFirst = document.getElementById('subtractionLargerFirst').checked;
+    const multiplicationLargerFirst = document.getElementById('multiplicationLargerFirst').checked;
+    const divisionLargerFirst = document.getElementById('divisionLargerFirst').checked;
+
+    const operations = [];
+    if (additionEnabled) operations.push('addition');
+    if (subtractionEnabled) operations.push('subtraction');
+    if (multiplicationEnabled) operations.push('multiplication');
+    if (divisionEnabled) operations.push('division');
+
+    let previousQuestion = null;
+
     for (let i = 0; i < 10; i++) {
-        let num1, num2, answer;
+        let question;
         do {
-            num1 = Math.floor(Math.random() * 11) + 2;
-            num2 = Math.floor(Math.random() * 11) + 2;
-            answer = num1 * num2;
-        } while (i > 0 && questions[i - 1].num1 === num1 && questions[i - 1].num2 === num2);
-        questions.push({ num1, num2, answer });
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2, answer;
+            switch (operation) {
+                case 'addition':
+                    num1 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                    num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                    if (additionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    answer = num1 + num2;
+                    break;
+                case 'subtraction':
+                    num1 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
+                    num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
+                    if (subtractionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    answer = num1 - num2;
+                    break;
+                case 'multiplication':
+                    num1 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                    num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                    if (multiplicationLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    answer = num1 * num2;
+                    break;
+                case 'division':
+                    num1 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                    num2 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                    if (divisionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    answer = (num1 / num2).toFixed(divisionDecimalPlace);
+                    break;
+            }
+            question = { num1, num2, answer, operation };
+        } while (previousQuestion && JSON.stringify(question) === JSON.stringify(previousQuestion));
+
+        questions.push(question);
+        previousQuestion = question;
     }
     console.log('Questions generated:', questions); // Debugging line
 }
@@ -30,7 +86,23 @@ function generateQuestions() {
 function displayQuestion() {
     console.log('Displaying question...'); // Debugging line
     const question = questions[currentQuestion];
-    document.getElementById('question').innerText = `What is ${question.num1} x ${question.num2}?`;
+    let questionText;
+    switch (question.operation) {
+        case 'addition':
+            questionText = `What is ${question.num1} + ${question.num2}?`;
+            break;
+        case 'subtraction':
+            questionText = `What is ${question.num1} - ${question.num2}?`;
+            break;
+        case 'multiplication':
+            questionText = `What is ${question.num1} x ${question.num2}?`;
+            break;
+        case 'division':
+            const decimalPlace = parseInt(document.getElementById('divisionDecimalPlace').value);
+            questionText = `What is ${question.num1} / ${question.num2}? (Answer to ${decimalPlace} decimal places)`;
+            break;
+    }
+    document.getElementById('question').innerText = questionText;
     console.log('Displayed question:', question); // Debugging line
 }
 
@@ -50,12 +122,13 @@ function updateScore() {
 
 // Function to check the user's answer
 function checkAnswer() {
-    const userAnswer = parseInt(document.getElementById('answer').value);
-    const correctAnswer = questions[currentQuestion].answer;
+    const userAnswer = parseFloat(document.getElementById('answer').value).toFixed(2);
+    const correctAnswer = parseFloat(questions[currentQuestion].answer).toFixed(2);
     if (userAnswer === correctAnswer) {
         score++;
     } else {
-        alert(`Incorrect! The correct answer is ${correctAnswer}.`);
+        const decimalPlace = questions[currentQuestion].operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
+        alert(`Incorrect! The correct answer is ${parseFloat(correctAnswer).toFixed(decimalPlace)}.`);
     }
     currentQuestion++;
     document.getElementById('answer').value = '';
@@ -69,11 +142,23 @@ function checkAnswer() {
     document.getElementById('answer').focus();
 }
 
+// Function to skip the current question
+function skipQuestion() {
+    currentQuestion++;
+    if (currentQuestion < 10) {
+        displayQuestion();
+    } else {
+        endGame();
+    }
+    // Automatically select the input box after skipping a question
+    document.getElementById('answer').focus();
+}
+
 // Function to end the game
 function endGame() {
     clearInterval(timerInterval);
     const endTime = new Date();
-    const timeTaken = (endTime - startTime) / 1000;
+    const timeTaken = roundTimeToNearestSecond((endTime - startTime) / 1000);
     document.getElementById('score').innerText = `You scored ${score} out of 10.`;
     document.getElementById('time').innerText = `Time taken: ${timeTaken} seconds.`;
     document.getElementById('game').style.display = 'none';
@@ -86,6 +171,9 @@ function endGame() {
 
     // Update chart
     updateChart();
+
+    // Stop the timer
+    clearInterval(timerInterval);
 }
 
 // Function to start the game
@@ -170,8 +258,8 @@ function updateChart() {
     // Display statistics
     const highestScore = Math.max(...scores);
     const lowestScore = Math.min(...scores);
-    const longestTime = Math.max(...times);
-    const shortestTime = Math.min(...times);
+    const longestTime = Math.max(...times.map(roundTimeToNearestSecond));
+    const shortestTime = Math.min(...times.map(roundTimeToNearestSecond));
 
     document.getElementById('highestScore').innerText = highestScore;
     document.getElementById('lowestScore').innerText = lowestScore;
@@ -187,12 +275,41 @@ function clearHistory() {
     document.getElementById('chartContainer').style.display = 'none';
 }
 
+// Function to toggle settings visibility
+function toggleSettings() {
+    const settings = document.getElementById('settings');
+    settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+}
+
+// Function to save settings
+function saveSettings() {
+    toggleSettings();
+    startGame(); // Restart the game with new settings
+}
+
+// Function to round time values to the nearest second
+function roundTimeToNearestSecond(time) {
+    return Math.round(time);
+}
+
+// Use the roundTimeToNearestSecond function to round the time values
+const timeElements = document.querySelectorAll('#time, #longestTime, #shortestTime');
+timeElements.forEach(element => {
+    const timeValue = parseFloat(element.textContent);
+    if (!isNaN(timeValue)) {
+        element.textContent = roundTimeToNearestSecond(timeValue) + ' seconds';
+    }
+});
+
 // Event listener for the submit button
 document.getElementById('submit').addEventListener('click', checkAnswer);
 // Event listener for the restart button
 document.getElementById('restart').addEventListener('click', startGame);
 // Event listener for the clear history button
 document.getElementById('clearHistory').addEventListener('click', clearHistory);
+
+// Event listener for the skip button
+document.getElementById('skip').addEventListener('click', skipQuestion);
 
 // Event listener for the answer input field to check answer on Enter key press
 document.getElementById('answer').addEventListener('keypress', function(event) {

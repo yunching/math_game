@@ -9,7 +9,52 @@
 </head>
 <body>
     <div class="container">
-        <h1>Multiplication Game</h1>
+        <h1>Quick Math Game</h1>
+        <div class="settings-icon" onclick="toggleSettings()" title="Settings">⚙️</div>
+        <div class="settings" id="settings">
+            <h2>Settings</h2>
+            <div class="settings-header">
+                <span>Select</span>
+                <span>Calculation Type</span>
+                <span>Min</span>
+                <span>Max</span>
+                <span>Larger Number First</span>
+                <span>Decimal Place</span>
+            </div>
+            <label>
+                <input type="checkbox" id="addition" checked>
+                <span>Addition</span>
+                <input type="number" id="additionMin" value="2">
+                <input type="number" id="additionMax" value="12">
+                <input type="checkbox" id="additionLargerFirst">
+                <span></span>
+            </label>
+            <label>
+                <input type="checkbox" id="subtraction" checked>
+                <span>Subtraction</span>
+                <input type="number" id="subtractionMin" value="2">
+                <input type="number" id="subtractionMax" value="12">
+                <input type="checkbox" id="subtractionLargerFirst" checked>
+                <span></span>
+            </label>
+            <label>
+                <input type="checkbox" id="multiplication" checked>
+                <span>Multiplication</span>
+                <input type="number" id="multiplicationMin" value="2">
+                <input type="number" id="multiplicationMax" value="12">
+                <input type="checkbox" id="multiplicationLargerFirst">
+                <span></span>
+            </label>
+            <label>
+                <input type="checkbox" id="division">
+                <span>Division</span>
+                <input type="number" id="divisionMin" value="2">
+                <input type="number" id="divisionMax" value="12">
+                <input type="checkbox" id="divisionLargerFirst" checked>
+                <input type="number" id="divisionDecimalPlace" value="2" min="0" style="width: 50px;">
+            </label>
+            <button onclick="saveSettings()">Save</button>
+        </div>
         <div id="status">
             <p id="currentScore">0 out of 0 (0%)</p>
             <p id="timer">Time: 0 seconds</p>
@@ -18,6 +63,7 @@
             <p id="question"></p>
             <input type="number" id="answer" placeholder="Your answer" inputmode="numeric">
             <br><br>
+            <button id="skip" style="font-size: 1.5em; padding: 10px 20px; margin-right: 10px;">Skip</button>
             <button id="submit" style="font-size: 1.5em; padding: 10px 20px;">Submit</button>
         </div>
         <div id="result" style="display: none;">
@@ -42,11 +88,11 @@
                     <td id="lowestScore"></td>
                 </tr>
                 <tr>
-                    <td>Longest Time (seconds)</td>
+                    <td>Longest time across games (seconds)</td>
                     <td id="longestTime"></td>
                 </tr>
                 <tr>
-                    <td>Shortest Time (seconds)</td>
+                    <td>Shortest time across games (seconds)</td>
                     <td id="shortestTime"></td>
                 </tr>
             </table>
@@ -54,5 +100,10 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        function roundTimeToNearestSecond(time) {
+            return Math.round(time);
+        }
+    </script>
 </body>
 </html>
