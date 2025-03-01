@@ -109,7 +109,7 @@ function displayQuestion() {
 // Function to update the timer display
 function updateTimer() {
     const currentTime = new Date();
-    const timeTaken = Math.floor((currentTime - startTime) / 1000);
+    const timeTaken = roundTimeToNearestSecond((currentTime - startTime) / 1000);
     document.getElementById('timer').innerText = `Time: ${timeTaken} seconds`;
 }
 
