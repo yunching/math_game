@@ -1,10 +1,17 @@
+// Array to store the questions
 let questions = [];
+// Index of the current question
 let currentQuestion = 0;
+// Player's score
 let score = 0;
+// Start time of the game
 let startTime;
+// Interval for the timer
 let timerInterval;
+// Chart instance for displaying the score history
 let chartInstance;
 
+// Function to generate multiplication questions
 function generateQuestions() {
     console.log('Generating questions...'); // Debugging line
     for (let i = 0; i < 10; i++) {
@@ -19,6 +26,7 @@ function generateQuestions() {
     console.log('Questions generated:', questions); // Debugging line
 }
 
+// Function to display the current question
 function displayQuestion() {
     console.log('Displaying question...'); // Debugging line
     const question = questions[currentQuestion];
@@ -26,18 +34,21 @@ function displayQuestion() {
     console.log('Displayed question:', question); // Debugging line
 }
 
+// Function to update the timer display
 function updateTimer() {
     const currentTime = new Date();
     const timeTaken = Math.floor((currentTime - startTime) / 1000);
     document.getElementById('timer').innerText = `Time: ${timeTaken} seconds`;
 }
 
+// Function to update the score display
 function updateScore() {
     const totalQuestions = currentQuestion;
     const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
     document.getElementById('currentScore').innerText = `${score} out of ${totalQuestions} (${percentage}%)`;
 }
 
+// Function to check the user's answer
 function checkAnswer() {
     const userAnswer = parseInt(document.getElementById('answer').value);
     const correctAnswer = questions[currentQuestion].answer;
@@ -56,6 +67,7 @@ function checkAnswer() {
     }
 }
 
+// Function to end the game
 function endGame() {
     clearInterval(timerInterval);
     const endTime = new Date();
@@ -74,6 +86,7 @@ function endGame() {
     updateChart();
 }
 
+// Function to start the game
 function startGame() {
     console.log('Starting game...'); // Debugging line
     questions = [];
@@ -91,6 +104,7 @@ function startGame() {
     console.log('Game started'); // Debugging line
 }
 
+// Function to update the score chart
 function updateChart() {
     const ctx = document.getElementById('scoreChart').getContext('2d');
     const history = JSON.parse(localStorage.getItem('history')) || [];
@@ -165,21 +179,27 @@ function updateChart() {
     document.getElementById('chartStatsTable').style.display = 'table';
 }
 
+// Function to clear the score history
 function clearHistory() {
     localStorage.removeItem('history');
     document.getElementById('chartContainer').style.display = 'none';
 }
 
+// Event listener for the submit button
 document.getElementById('submit').addEventListener('click', checkAnswer);
+// Event listener for the restart button
 document.getElementById('restart').addEventListener('click', startGame);
+// Event listener for the clear history button
 document.getElementById('clearHistory').addEventListener('click', clearHistory);
 
+// Event listener for the answer input field to check answer on Enter key press
 document.getElementById('answer').addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         checkAnswer();
     }
 });
 
+// Event listener for keyboard navigation between result buttons
 document.addEventListener('keydown', function(event) {
     const resultButtons = ['restart', 'clearHistory'];
     const currentIndex = resultButtons.findIndex(id => document.activeElement.id === id);
@@ -193,4 +213,5 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+// Start the game when the script is loaded
 startGame();
