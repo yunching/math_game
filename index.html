@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Multiplication Game</h1>
+        <div id="status">
+            <p id="currentScore">0 out of 0 (0%)</p>
+            <p id="timer">Time: 0 seconds</p>
+        </div>
+        <div id="game">
+            <p id="question"></p>
+            <input type="number" id="answer" placeholder="Your answer">
+            <button id="submit">Submit</button>
+        </div>
+        <div id="result" style="display: none;">
+            <p id="score"></p>
+            <p id="time"></p>
+            <button id="restart">Play Again</button>
+        </div>
+        <div id="chartContainer" style="display: none;">
+            <canvas id="scoreChart"></canvas>
+            <p id="chartStats"></p>
+            <table id="chartStatsTable" style="display: none;">
+                <tr>
+                    <th>Statistic</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Highest Score</td>
+                    <td id="highestScore"></td>
+                </tr>
+                <tr>
+                    <td>Lowest Score</td>
+                    <td id="lowestScore"></td>
+                </tr>
+                <tr>
+                    <td>Longest Time (seconds)</td>
+                    <td id="longestTime"></td>
+                </tr>
+                <tr>
+                    <td>Shortest Time (seconds)</td>
+                    <td id="shortestTime"></td>
+                </tr>
+            </table>
+            <button id="clearHistory">Clear Score History</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
