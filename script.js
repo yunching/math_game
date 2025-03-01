@@ -332,5 +332,18 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+document.addEventListener('keydown', function(event) {
+    const mainScreenElements = ['answer', 'skip', 'submit'];
+    const currentIndex = mainScreenElements.findIndex(id => document.activeElement.id === id);
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        const nextIndex = (currentIndex + 1) % mainScreenElements.length;
+        document.getElementById(mainScreenElements[nextIndex]).focus();
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        const prevIndex = (currentIndex - 1 + mainScreenElements.length) % mainScreenElements.length;
+        document.getElementById(mainScreenElements[prevIndex]).focus();
+    }
+});
+
 // Start the game when the script is loaded
 startGame();
