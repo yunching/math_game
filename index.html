@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Math Game</title>
+    <title>Multiplication Game</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="description" content="A fun and quick math practice game for all ages">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Quick Math Game">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-512x512.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-64x64.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-64x64.png">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -117,9 +132,63 @@
                 </div>
             </div>
         </div>
+        <div class="text-center mt-3">
+            <p id="pwa-install" style="display: none;">
+                <button id="install-button" class="btn btn-outline-primary">Install App</button>
+            </p>
+        </div>
     </div>
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            // Only register the service worker if we're on HTTPS or localhost
+            if (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(reg => console.log('Service Worker registered: ', reg))
+                        .catch(err => console.log('Service Worker registration failed: ', err));
+                });
+            } else {
+                console.log('Service Worker not registered: Must be served over HTTPS or from localhost');
+            }
+        }
+        
+        // PWA Installation Logic
+        let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        const pwaInstallPrompt = document.getElementById('pwa-install');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            pwaInstallPrompt.style.display = 'block';
+        });
+        
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // We no longer need the prompt. Clear it up.
+                deferredPrompt = null;
+                // Hide the install button
+                pwaInstallPrompt.style.display = 'none';
+            }
+        });
+        
+        // If the app was successfully installed, hide the install button
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App was installed', evt);
+            pwaInstallPrompt.style.display = 'none';
+        });
+    </script>
 </body>
 </html>
