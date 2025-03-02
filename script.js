@@ -10,6 +10,8 @@ let startTime;
 let timerInterval;
 // Chart instance for displaying the score history
 let chartInstance;
+// Maximum time allowed in seconds (10 minutes)
+const MAX_TIME_LIMIT = 600;
 
 // Function to generate questions based on settings
 function generateQuestions() {
@@ -110,6 +112,15 @@ function displayQuestion() {
 function updateTimer() {
     const currentTime = new Date();
     const timeTaken = roundTimeToNearestSecond((currentTime - startTime) / 1000);
+    
+    // Check if time limit has been reached
+    if (timeTaken >= MAX_TIME_LIMIT) {
+        document.getElementById('timer').innerText = `Time: ${MAX_TIME_LIMIT} seconds (Time's up!)`;
+        // Auto-end the game when time limit is reached
+        endGame(true);
+        return;
+    }
+    
     document.getElementById('timer').innerText = `Time: ${timeTaken} seconds`;
 }
 
@@ -155,24 +166,40 @@ function skipQuestion() {
 }
 
 // Function to end the game
-function endGame() {
+function endGame(timeExpired = false) {
     // Stop the timer
     clearInterval(timerInterval);
     
     const endTime = new Date();
-    const timeTaken = roundTimeToNearestSecond((endTime - startTime) / 1000);
+    let timeTaken = roundTimeToNearestSecond((endTime - startTime) / 1000);
+    
+    // Cap time at MAX_TIME_LIMIT if time expired
+    if (timeExpired) {
+        timeTaken = MAX_TIME_LIMIT;
+    }
     
     // Hide the status display
     document.getElementById('status').style.display = 'none';
     
-    document.getElementById('score').innerText = `You scored ${score} out of 10.`;
+    let scoreText = `You scored ${score} out of `;
+    
+    // If game ended early due to time limit, show current question count
+    if (timeExpired && currentQuestion < 10) {
+        scoreText += `${currentQuestion} questions attempted.`;
+        // Display a message about time expiring
+        document.getElementById('score').innerHTML = `${scoreText}<br><span class="text-danger">Time limit of 10 minutes reached!</span>`;
+    } else {
+        scoreText += '10.';
+        document.getElementById('score').innerText = scoreText;
+    }
+    
     document.getElementById('time').innerText = `Time taken: ${timeTaken} seconds.`;
     document.getElementById('game').style.display = 'none';
     document.getElementById('result').style.display = 'block';
 
     // Store score and time in local storage
     let history = JSON.parse(localStorage.getItem('history')) || [];
-    history.push({ score, timeTaken });
+    history.push({ score, timeTaken, timeExpired });
     localStorage.setItem('history', JSON.stringify(history));
 
     // Update chart
