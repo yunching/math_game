@@ -37,8 +37,26 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Check if URL is cacheable
+function isCacheableUrl(url) {
+  const urlObj = new URL(url);
+  const supportedSchemes = ['http:', 'https:'];
+  
+  // Only cache HTTP and HTTPS requests
+  if (!supportedSchemes.includes(urlObj.protocol)) {
+    return false;
+  }
+  
+  return true;
+}
+
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
+  // Skip non-cacheable URL schemes
+  if (!isCacheableUrl(event.request.url)) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -46,6 +64,7 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
+        
         return fetch(event.request).then(
           response => {
             // Check if we received a valid response
@@ -56,10 +75,13 @@ self.addEventListener('fetch', event => {
             // Clone the response
             const responseToCache = response.clone();
 
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
+            // Only cache if URL is cacheable
+            if (isCacheableUrl(event.request.url)) {
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+            }
 
             return response;
           }
