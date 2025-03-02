@@ -194,13 +194,3 @@ button:hover {
         padding: 10px;
     }
 }
-
-/* Fix for -ms-high-contrast deprecation */
-@media (forced-colors: active) {
-  /* This replaces the deprecated -ms-high-contrast media feature */
-  .btn-primary {
-    forced-color-adjust: none;
-  }
-  
-  /* Additional overrides can be added here for other components if needed */
-}

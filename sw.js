@@ -39,20 +39,22 @@ self.addEventListener('activate', event => {
 
 // Check if URL is cacheable
 function isCacheableUrl(url) {
-  const urlObj = new URL(url);
-  const supportedSchemes = ['http:', 'https:'];
-  
-  // Only cache HTTP and HTTPS requests
-  if (!supportedSchemes.includes(urlObj.protocol)) {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+  } catch (e) {
     return false;
   }
-  
-  return true;
 }
 
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
-  // Skip non-cacheable URL schemes
+  // Skip non-GET requests and non-cacheable URL schemes
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Check if URL is cacheable before proceeding
   if (!isCacheableUrl(event.request.url)) {
     return;
   }
@@ -65,31 +67,42 @@ self.addEventListener('fetch', event => {
           return response;
         }
         
-        return fetch(event.request).then(
+        // Clone the request to avoid consuming it
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(
           response => {
             // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
+            if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
-            // Clone the response
-            const responseToCache = response.clone();
-
-            // Only cache if URL is cacheable
-            if (isCacheableUrl(event.request.url)) {
+            try {
+              // Clone the response to avoid consuming it
+              const responseToCache = response.clone();
+              
+              // Use a separate async operation to cache the response
               caches.open(CACHE_NAME)
                 .then(cache => {
-                  cache.put(event.request, responseToCache);
-                });
+                  // Double check that the URL is still cacheable
+                  if (isCacheableUrl(event.request.url)) {
+                    cache.put(event.request, responseToCache)
+                      .catch(err => console.log('Cache put error:', err));
+                  }
+                })
+                .catch(err => console.log('Cache open error:', err));
+                
+              return response;
+            } catch (err) {
+              console.log('Caching error:', err);
+              return response;
             }
-
-            return response;
           }
-        );
-      })
-      .catch(() => {
-        // If both cache and network fail, show a generic fallback
-        return caches.match('./index.html');
+        ).catch(err => {
+          console.log('Fetch error:', err);
+          // If network request fails, try to return the offline page
+          return caches.match('./index.html');
+        });
       })
   );
 });
