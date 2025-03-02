@@ -133,9 +133,6 @@
             </div>
         </div>
         <div class="text-center mt-3">
-            <p id="pwa-install" style="display: none;">
-                <button id="install-button" class="btn btn-outline-primary">Install App</button>
-            </p>
         </div>
     </div>
     <!-- Bootstrap JS Bundle with Popper -->
@@ -158,36 +155,16 @@
         
         // PWA Installation Logic
         let deferredPrompt;
-        const installButton = document.getElementById('install-button');
-        const pwaInstallPrompt = document.getElementById('pwa-install');
-        
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show the install button
-            pwaInstallPrompt.style.display = 'block';
         });
         
-        installButton.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to the install prompt: ${outcome}`);
-                // We no longer need the prompt. Clear it up.
-                deferredPrompt = null;
-                // Hide the install button
-                pwaInstallPrompt.style.display = 'none';
-            }
-        });
-        
-        // If the app was successfully installed, hide the install button
+        // If the app was successfully installed, log the event
         window.addEventListener('appinstalled', (evt) => {
             console.log('App was installed', evt);
-            pwaInstallPrompt.style.display = 'none';
         });
     </script>
 </body>
