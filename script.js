@@ -312,7 +312,17 @@ function clearHistory() {
 // Function to toggle settings visibility
 function toggleSettings() {
     const settings = document.getElementById('settings');
-    settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+    if (settings.style.display === 'none' || settings.style.display === '') {
+        settings.style.display = 'block';
+        // Add a class to indicate the settings are visible - helps with testing
+        settings.classList.add('visible');
+        console.log('Settings panel opened'); // Debugging line
+    } else {
+        settings.style.display = 'none';
+        // Remove the visible class
+        settings.classList.remove('visible');
+        console.log('Settings panel closed'); // Debugging line
+    }
 }
 
 // Function to save settings
