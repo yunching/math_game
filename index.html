@@ -41,7 +41,7 @@
                         <span>Min</span>
                         <span>Max</span>
                         <span>Larger Number First</span>
-                        <span>Fixed Number</span>
+                        <span title="Set a fixed value for one operand. For multiplication, this fixes the first number (e.g., set to 7 to practice the 7 times table). Set to 0 to disable.">Fixed Number</span>
                         <span>Decimal Place</span>
                     </div>
                     <label>
@@ -50,7 +50,7 @@
                         <input type="number" id="additionMin" value="2">
                         <input type="number" id="additionMax" value="12">
                         <input type="checkbox" id="additionLargerFirst">
-                        <input type="number" id="additionFixed" value="0" min="0">
+                        <input type="number" id="additionFixed" value="0" min="0" title="Set a fixed first number for addition problems (e.g., 5+2, 5+3, etc.). Set to 0 to use random numbers.">
                         <span></span>
                     </label>
                     <label>
@@ -59,7 +59,7 @@
                         <input type="number" id="subtractionMin" value="2">
                         <input type="number" id="subtractionMax" value="12">
                         <input type="checkbox" id="subtractionLargerFirst" checked>
-                        <input type="number" id="subtractionFixed" value="0" min="0">
+                        <input type="number" id="subtractionFixed" value="0" min="0" title="Set a fixed first number for subtraction problems (e.g., 10-2, 10-3, etc.). Set to 0 to use random numbers.">
                         <span></span>
                     </label>
                     <label>
@@ -68,7 +68,7 @@
                         <input type="number" id="multiplicationMin" value="2">
                         <input type="number" id="multiplicationMax" value="12">
                         <input type="checkbox" id="multiplicationLargerFirst">
-                        <input type="number" id="multiplicationFixed" value="0" min="0">
+                        <input type="number" id="multiplicationFixed" value="0" min="0" title="Set a fixed first number for multiplication problems to practice times tables (e.g., 7×2, 7×3, etc.). Set to 0 to use random numbers.">
                         <span></span>
                     </label>
                     <label>
@@ -77,7 +77,7 @@
                         <input type="number" id="divisionMin" value="2">
                         <input type="number" id="divisionMax" value="12">
                         <input type="checkbox" id="divisionLargerFirst" checked>
-                        <input type="number" id="divisionFixed" value="0" min="0">
+                        <input type="number" id="divisionFixed" value="0" min="0" title="Set a fixed divisor for division problems (e.g., 10÷2, 15÷2, etc.). Set to 0 to use random numbers.">
                         <input type="number" id="divisionDecimalPlace" value="2" min="0">
                     </label>
                     <button class="btn btn-primary" onclick="saveSettings()">Save</button>
