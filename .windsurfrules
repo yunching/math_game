@@ -1,0 +1,9 @@
+## Preferred Tools and Libraries
+- **Frameworks**: Node.js for backend with a basic HTTP server, vanilla javascript for frontend
+- **Styling**: Plain css
+- **Testing**: Selenium
+
+## Testing Guidelines
+- Write unit tests for all utility functions
+- Ensure 80% test coverage for new features
+
