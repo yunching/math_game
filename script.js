@@ -59,6 +59,10 @@ function generateQuestions() {
                     if (additionFixed > 0) {
                         num1 = additionFixed;
                         num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                        // Apply larger first if checked
+                        if (additionLargerFirst && num2 > num1) {
+                            [num1, num2] = [num2, num1];
+                        }
                     } else {
                         num1 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
                         num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
@@ -70,8 +74,10 @@ function generateQuestions() {
                     if (subtractionFixed > 0) {
                         num1 = subtractionFixed;
                         num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
-                        // Ensure result isn't negative if fixed number is used
-                        if (subtractionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                        // Apply larger first if checked
+                        if (subtractionLargerFirst && num2 > num1) {
+                            [num1, num2] = [num2, num1];
+                        }
                     } else {
                         num1 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
                         num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
@@ -83,6 +89,10 @@ function generateQuestions() {
                     if (multiplicationFixed > 0) {
                         num1 = multiplicationFixed;
                         num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                        // Apply larger first if checked
+                        if (multiplicationLargerFirst && num2 > num1) {
+                            [num1, num2] = [num2, num1];
+                        }
                     } else {
                         num1 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
                         num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
@@ -98,6 +108,7 @@ function generateQuestions() {
                         const quotient = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
                         // Calculate dividend to ensure clean division
                         num1 = num2 * quotient;
+                        // Apply larger first if checked
                         if (!divisionLargerFirst) [num1, num2] = [num2, num1];
                     } else {
                         num1 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
@@ -368,6 +379,32 @@ function roundTimeToNearestSecond(time) {
     return Math.round(time);
 }
 
+// Function to handle fixed number input changes
+function handleFixedNumberChange(event) {
+    const operation = event.target.id.replace('Fixed', '');
+    const fixedValue = parseInt(event.target.value) || 0;
+    const largerFirstCheckbox = document.getElementById(`${operation}LargerFirst`);
+    
+    // If fixed number is set (greater than 0), uncheck the "Larger Number First" checkbox
+    if (fixedValue > 0) {
+        largerFirstCheckbox.checked = false;
+    }
+    
+    // Note: User can still manually check it after setting a fixed number
+}
+
+// Initialize the game when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for fixed number inputs
+    document.getElementById('multiplicationFixed').addEventListener('input', handleFixedNumberChange);
+    document.getElementById('additionFixed').addEventListener('input', handleFixedNumberChange);
+    document.getElementById('subtractionFixed').addEventListener('input', handleFixedNumberChange);
+    document.getElementById('divisionFixed').addEventListener('input', handleFixedNumberChange);
+    
+    // Start the game
+    startGame();
+});
+
 // Use the roundTimeToNearestSecond function to round the time values
 const timeElements = document.querySelectorAll('#time, #longestTime, #shortestTime');
 timeElements.forEach(element => {
@@ -420,6 +457,3 @@ document.addEventListener('keydown', function(event) {
         document.getElementById(mainScreenElements[prevIndex]).focus();
     }
 });
-
-// Start the game when the script is loaded
-startGame();
