@@ -41,6 +41,7 @@
                         <span>Min</span>
                         <span>Max</span>
                         <span>Larger Number First</span>
+                        <span>Fixed Number</span>
                         <span>Decimal Place</span>
                     </div>
                     <label>
@@ -49,6 +50,7 @@
                         <input type="number" id="additionMin" value="2">
                         <input type="number" id="additionMax" value="12">
                         <input type="checkbox" id="additionLargerFirst">
+                        <input type="number" id="additionFixed" value="0" min="0">
                         <span></span>
                     </label>
                     <label>
@@ -57,6 +59,7 @@
                         <input type="number" id="subtractionMin" value="2">
                         <input type="number" id="subtractionMax" value="12">
                         <input type="checkbox" id="subtractionLargerFirst" checked>
+                        <input type="number" id="subtractionFixed" value="0" min="0">
                         <span></span>
                     </label>
                     <label>
@@ -65,6 +68,7 @@
                         <input type="number" id="multiplicationMin" value="2">
                         <input type="number" id="multiplicationMax" value="12">
                         <input type="checkbox" id="multiplicationLargerFirst">
+                        <input type="number" id="multiplicationFixed" value="0" min="0">
                         <span></span>
                     </label>
                     <label>
@@ -73,6 +77,7 @@
                         <input type="number" id="divisionMin" value="2">
                         <input type="number" id="divisionMax" value="12">
                         <input type="checkbox" id="divisionLargerFirst" checked>
+                        <input type="number" id="divisionFixed" value="0" min="0">
                         <input type="number" id="divisionDecimalPlace" value="2" min="0">
                     </label>
                     <button class="btn btn-primary" onclick="saveSettings()">Save</button>

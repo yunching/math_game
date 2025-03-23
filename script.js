@@ -36,6 +36,11 @@ function generateQuestions() {
     const multiplicationLargerFirst = document.getElementById('multiplicationLargerFirst').checked;
     const divisionLargerFirst = document.getElementById('divisionLargerFirst').checked;
 
+    const additionFixed = parseInt(document.getElementById('additionFixed').value);
+    const subtractionFixed = parseInt(document.getElementById('subtractionFixed').value);
+    const multiplicationFixed = parseInt(document.getElementById('multiplicationFixed').value);
+    const divisionFixed = parseInt(document.getElementById('divisionFixed').value);
+
     const operations = [];
     if (additionEnabled) operations.push('addition');
     if (subtractionEnabled) operations.push('subtraction');
@@ -51,27 +56,54 @@ function generateQuestions() {
             let num1, num2, answer;
             switch (operation) {
                 case 'addition':
-                    num1 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
-                    num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
-                    if (additionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    if (additionFixed > 0) {
+                        num1 = additionFixed;
+                        num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                    } else {
+                        num1 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                        num2 = Math.floor(Math.random() * (additionMax - additionMin + 1)) + additionMin;
+                        if (additionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    }
                     answer = num1 + num2;
                     break;
                 case 'subtraction':
-                    num1 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
-                    num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
-                    if (subtractionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    if (subtractionFixed > 0) {
+                        num1 = subtractionFixed;
+                        num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
+                        // Ensure result isn't negative if fixed number is used
+                        if (subtractionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    } else {
+                        num1 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
+                        num2 = Math.floor(Math.random() * (subtractionMax - subtractionMin + 1)) + subtractionMin;
+                        if (subtractionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    }
                     answer = num1 - num2;
                     break;
                 case 'multiplication':
-                    num1 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
-                    num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
-                    if (multiplicationLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    if (multiplicationFixed > 0) {
+                        num1 = multiplicationFixed;
+                        num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                    } else {
+                        num1 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                        num2 = Math.floor(Math.random() * (multiplicationMax - multiplicationMin + 1)) + multiplicationMin;
+                        if (multiplicationLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    }
                     answer = num1 * num2;
                     break;
                 case 'division':
-                    num1 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
-                    num2 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
-                    if (divisionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    if (divisionFixed > 0) {
+                        // For division with fixed number as divisor
+                        num2 = divisionFixed;
+                        // Generate a random number within range for the quotient
+                        const quotient = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                        // Calculate dividend to ensure clean division
+                        num1 = num2 * quotient;
+                        if (!divisionLargerFirst) [num1, num2] = [num2, num1];
+                    } else {
+                        num1 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                        num2 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                        if (divisionLargerFirst && num1 < num2) [num1, num2] = [num2, num1];
+                    }
                     answer = (num1 / num2).toFixed(divisionDecimalPlace);
                     break;
             }
