@@ -47,6 +47,9 @@ jobs:
           sleep 1
         done
 
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+
         if [ "$SERVER_READY" != true ]; then
           echo "Error: Server did not become ready within 30 seconds. Failing early."
           exit 1
