@@ -42,6 +42,7 @@ You can also serve the files (`index.html`, `styles.css`, `script.js`, and asset
 Run the Selenium smoke test (requires Chrome and compatible chromedriver):
 
 ```bash
+pip install -r requirements.txt
 python test_game.py
 ```
 
