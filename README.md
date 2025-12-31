@@ -36,6 +36,7 @@ You can also serve the files (`index.html`, `styles.css`, `script.js`, and asset
 - `script.js`: Game logic for question generation, scoring, and timing.
 - `server.js`: Local static file server.
 - `manifest.json`, `sw.js`: Progressive web app support.
+- `icons/`: PWA icon assets.
 - `test_game.py`: Selenium UI smoke tests.
 
 ## Tests
