@@ -296,5 +296,81 @@ class MathGameTest(unittest.TestCase):
         except UnexpectedAlertPresentException:
             self.dismiss_alert()
 
+    def test_division_fixed_number_larger_first(self):
+        """Test division fixed number keeps divisor when Larger Number First is enabled"""
+        self.open_settings()
+
+        for op in ["addition", "subtraction", "multiplication"]:
+            checkbox = self.driver.find_element(By.ID, op)
+            if checkbox.is_selected():
+                checkbox.click()
+
+        division_checkbox = self.driver.find_element(By.ID, "division")
+        if not division_checkbox.is_selected():
+            division_checkbox.click()
+
+        fixed_input = self.driver.find_element(By.ID, "divisionFixed")
+        fixed_input.clear()
+        fixed_input.send_keys("4")
+
+        larger_first_checkbox = self.driver.find_element(By.ID, "divisionLargerFirst")
+        if not larger_first_checkbox.is_selected():
+            larger_first_checkbox.click()
+
+        self.close_settings()
+        time.sleep(1)
+
+        try:
+            question_element = self.driver.find_element(By.ID, "question")
+            question_text = question_element.text
+            match = re.search(r'What is (\d+) / (\d+)\?', question_text)
+            if match:
+                num1 = int(match.group(1))
+                num2 = int(match.group(2))
+                self.assertEqual(num2, 4, f"Expected divisor to be 4, but got {num2}")
+                self.assertEqual(num1 % num2, 0, "Dividend should be a multiple of divisor")
+                correct_answer = num1 / num2
+                self.submit_answer(correct_answer)
+        except UnexpectedAlertPresentException:
+            self.dismiss_alert()
+
+    def test_division_fixed_number_not_larger_first(self):
+        """Test division fixed number moves to first position when Larger Number First is disabled"""
+        self.open_settings()
+
+        for op in ["addition", "subtraction", "multiplication"]:
+            checkbox = self.driver.find_element(By.ID, op)
+            if checkbox.is_selected():
+                checkbox.click()
+
+        division_checkbox = self.driver.find_element(By.ID, "division")
+        if not division_checkbox.is_selected():
+            division_checkbox.click()
+
+        fixed_input = self.driver.find_element(By.ID, "divisionFixed")
+        fixed_input.clear()
+        fixed_input.send_keys("6")
+
+        larger_first_checkbox = self.driver.find_element(By.ID, "divisionLargerFirst")
+        if larger_first_checkbox.is_selected():
+            larger_first_checkbox.click()
+
+        self.close_settings()
+        time.sleep(1)
+
+        try:
+            question_element = self.driver.find_element(By.ID, "question")
+            question_text = question_element.text
+            match = re.search(r'What is (\d+) / (\d+)\?', question_text)
+            if match:
+                num1 = int(match.group(1))
+                num2 = int(match.group(2))
+                self.assertEqual(num1, 6, f"Expected first number to be 6, but got {num1}")
+                self.assertEqual(num1 % num2, 0, "Fixed number (dividend) should be divisible by second number (divisor)")
+                correct_answer = num1 / num2
+                self.submit_answer(correct_answer)
+        except UnexpectedAlertPresentException:
+            self.dismiss_alert()
+
 if __name__ == "__main__":
     unittest.main()
