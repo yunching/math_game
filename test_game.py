@@ -366,7 +366,7 @@ class MathGameTest(unittest.TestCase):
                 num1 = int(match.group(1))
                 num2 = int(match.group(2))
                 self.assertEqual(num1, 6, f"Expected first number to be 6, but got {num1}")
-                self.assertEqual(num2 % num1, 0, "Second number should be a multiple of fixed number")
+                self.assertEqual(num1 % num2, 0, "Fixed number (dividend) should be divisible by second number (divisor)")
                 correct_answer = num1 / num2
                 self.submit_answer(correct_answer)
         except UnexpectedAlertPresentException:
