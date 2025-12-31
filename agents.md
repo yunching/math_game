@@ -1,7 +1,7 @@
 # Agent Guide
 
 ## Project overview
-This repository hosts a simple browser-based quick math game. The UI is defined in `index.html` with styling in `styles.css`, and gameplay logic in `script.js`. A tiny Node HTTP server (`server.js`) serves the static files for local development.
+This repository hosts a simple browser-based Quick Math Game. The UI is defined in `index.html` with styling in `styles.css`, and gameplay logic in `script.js`. A tiny Node HTTP server (`server.js`) serves the static files for local development.
 
 ## Common commands
 - Start the local server:
