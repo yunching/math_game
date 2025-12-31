@@ -36,14 +36,21 @@ jobs:
       run: |
         node server.js &
         # Wait for server to be ready
+        SERVER_READY=false
         for i in {1..30}; do
           if curl -s http://localhost:8080 > /dev/null; then
             echo "Server is ready!"
+            SERVER_READY=true
             break
           fi
           echo "Waiting for server to start... ($i/30)"
           sleep 1
         done
+
+        if [ "$SERVER_READY" != true ]; then
+          echo "Error: Server did not become ready within 30 seconds. Failing early."
+          exit 1
+        fi
     
     - name: Run Selenium tests
       run: python test_game.py
