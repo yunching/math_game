@@ -36,11 +36,17 @@ class MathGameTest(unittest.TestCase):
         if not is_port_in_use(8080):
             print("Starting new server instance...")
             # Start the local server
-            if os.name == "nt":
-                cls.server_process = subprocess.Popen(['start-server.bat'], shell=True)
-            else:
-                cls.server_process = subprocess.Popen(['node', 'server.js'])
-            time.sleep(5)  # Wait for the server to start
+            try:
+                if os.name == "nt":
+                    cls.server_process = subprocess.Popen(['cmd', '/c', 'start-server.bat'])
+                else:
+                    cls.server_process = subprocess.Popen(['node', 'server.js'])
+                time.sleep(5)  # Wait for the server to start
+            except (OSError, subprocess.SubprocessError) as e:
+                raise RuntimeError(
+                    "Failed to start local server. Ensure Node.js is installed, "
+                    "the 'node' command is available, and 'server.js' exists."
+                ) from e
         else:
             print("Server already running on port 8080, proceeding with tests...")
     
