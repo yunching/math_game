@@ -11,6 +11,7 @@ import socket
 import subprocess
 import unittest
 import re
+import os
 
 # Function to check if server is already running on port 8080
 def is_port_in_use(port):
@@ -35,7 +36,10 @@ class MathGameTest(unittest.TestCase):
         if not is_port_in_use(8080):
             print("Starting new server instance...")
             # Start the local server
-            cls.server_process = subprocess.Popen(['start-server.bat'], shell=True)
+            if os.name == "nt":
+                cls.server_process = subprocess.Popen(['start-server.bat'], shell=True)
+            else:
+                cls.server_process = subprocess.Popen(['node', 'server.js'])
             time.sleep(5)  # Wait for the server to start
         else:
             print("Server already running on port 8080, proceeding with tests...")
