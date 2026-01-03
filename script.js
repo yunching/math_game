@@ -117,14 +117,9 @@ function generateQuestions() {
                                     divisors.push(d);
                                 }
                             }
-                            // If no valid divisors found, fall back to 1 if it's in range, otherwise use divisionMin
+                            // If no valid divisors found, fall back to using num1 itself (result = 1)
                             if (divisors.length === 0) {
-                                if (divisionMin <= 1 && 1 <= divisionMax) {
-                                    divisors.push(1);
-                                } else {
-                                    // Use divisionMin as fallback (may not divide evenly, but respects range)
-                                    divisors.push(divisionMin);
-                                }
+                                divisors.push(num1);
                             }
                             // Randomly pick a divisor (num2)
                             num2 = divisors[Math.floor(Math.random() * divisors.length)];
