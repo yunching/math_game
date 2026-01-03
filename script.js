@@ -102,14 +102,28 @@ function generateQuestions() {
                     break;
                 case 'division':
                     if (divisionFixed > 0) {
-                        // For division with fixed number as divisor
-                        num2 = divisionFixed;
-                        // Generate a random number within range for the quotient
-                        const quotient = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
-                        // Calculate dividend to ensure clean division
-                        num1 = num2 * quotient;
-                        // Apply larger first if checked
-                        if (!divisionLargerFirst) [num1, num2] = [num2, num1];
+                        if (divisionLargerFirst) {
+                            // Fixed number as divisor (second position)
+                            num2 = divisionFixed;
+                            const quotient = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
+                            num1 = num2 * quotient;
+                        } else {
+                            // Fixed number as dividend (first position)
+                            num1 = divisionFixed;
+                            // Find all divisors of num1 within allowed range
+                            let divisors = [];
+                            for (let d = divisionMin; d <= divisionMax; d++) {
+                                if (d !== 0 && num1 % d === 0) {
+                                    divisors.push(d);
+                                }
+                            }
+                            // If no valid divisors found, use 1 as fallback
+                            if (divisors.length === 0) {
+                                divisors.push(1);
+                            }
+                            // Randomly pick a divisor (num2)
+                            num2 = divisors[Math.floor(Math.random() * divisors.length)];
+                        }
                     } else {
                         num1 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
                         num2 = Math.floor(Math.random() * (divisionMax - divisionMin + 1)) + divisionMin;
