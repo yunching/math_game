@@ -31,6 +31,9 @@ function generateQuestions() {
     const divisionMax = parseInt(document.getElementById('divisionMax').value);
     const divisionDecimalPlace = parseInt(document.getElementById('divisionDecimalPlace').value);
 
+    const fractionsEnabled = document.getElementById('fractions').checked;
+    const fractionsMaxDenominator = parseInt(document.getElementById('fractionsMaxDenominator').value);
+
     const additionLargerFirst = document.getElementById('additionLargerFirst').checked;
     const subtractionLargerFirst = document.getElementById('subtractionLargerFirst').checked;
     const multiplicationLargerFirst = document.getElementById('multiplicationLargerFirst').checked;
@@ -46,6 +49,7 @@ function generateQuestions() {
     if (subtractionEnabled) operations.push('subtraction');
     if (multiplicationEnabled) operations.push('multiplication');
     if (divisionEnabled) operations.push('division');
+    if (fractionsEnabled) operations.push('fractions');
 
     let previousQuestion = null;
 
@@ -131,8 +135,45 @@ function generateQuestions() {
                     }
                     answer = (num1 / num2).toFixed(divisionDecimalPlace);
                     break;
+                case 'fractions':
+                    const den = Math.floor(Math.random() * (fractionsMaxDenominator - 2 + 1)) + 2; // Denominator between 2 and max
+                    // Generate two numerators such that their sum/difference is positive and reasonable
+                    // For simplicity, we'll stick to addition and subtraction of like fractions for now
+                    const fracOp = Math.random() < 0.5 ? '+' : '-';
+                    let n1 = Math.floor(Math.random() * (den - 1)) + 1; // 1 to den-1
+                    let n2 = Math.floor(Math.random() * (den - 1)) + 1; // 1 to den-1
+
+                    if (fracOp === '-') {
+                        // Ensure n1 >= n2
+                        if (n1 < n2) [n1, n2] = [n2, n1];
+                        answer = (n1 - n2) / den;
+                        question = {
+                            num1: n1,
+                            num2: n2,
+                            den: den,
+                            answer: answer,
+                            operation: 'fractions',
+                            subOperation: '-',
+                            answerDisplay: `${n1 - n2}/${den}`
+                        };
+                    } else {
+                        answer = (n1 + n2) / den;
+                        question = {
+                            num1: n1,
+                            num2: n2,
+                            den: den,
+                            answer: answer,
+                            operation: 'fractions',
+                            subOperation: '+',
+                            answerDisplay: `${n1 + n2}/${den}`
+                        };
+                    }
+                    // Override the generic question assignment for fractions because it has extra properties
+                    break;
             }
-            question = { num1, num2, answer, operation };
+            if (operation !== 'fractions') {
+                question = { num1, num2, answer, operation };
+            }
         } while (previousQuestion && JSON.stringify(question) === JSON.stringify(previousQuestion));
 
         questions.push(question);
@@ -159,6 +200,9 @@ function displayQuestion() {
         case 'division':
             const decimalPlace = parseInt(document.getElementById('divisionDecimalPlace').value);
             questionText = `What is ${question.num1} / ${question.num2}? (Answer to ${decimalPlace} decimal places)`;
+            break;
+        case 'fractions':
+            questionText = `What is ${question.num1}/${question.den} ${question.subOperation} ${question.num2}/${question.den}?`;
             break;
     }
     document.getElementById('question').innerText = questionText;
@@ -190,13 +234,87 @@ function updateScore() {
 
 // Function to check the user's answer
 function checkAnswer() {
-    const userAnswer = parseFloat(document.getElementById('answer').value).toFixed(2);
-    const correctAnswer = parseFloat(questions[currentQuestion].answer).toFixed(2);
-    if (userAnswer === correctAnswer) {
+    const userStr = document.getElementById('answer').value.trim();
+    if (!userStr) return; // Ignore empty input
+
+    let userVal;
+    if (userStr.includes('/')) {
+        const parts = userStr.split('/');
+        if (parts.length === 2) {
+            userVal = parseInt(parts[0]) / parseInt(parts[1]);
+        } else {
+            userVal = NaN;
+        }
+    } else {
+        userVal = parseFloat(userStr);
+    }
+
+    const currentQ = questions[currentQuestion];
+    let correctVal = parseFloat(currentQ.answer);
+
+    // Determine tolerance
+    // For fractions, we want 1/2 == 0.5.
+    // Standard questions use toFixed(2) logic in original code, so let's try to maintain that behavior for non-fractions
+    // or unify it.
+
+    let isCorrect = false;
+
+    if (currentQ.operation === 'fractions') {
+         // Tolerance for floating point comparison
+         if (Math.abs(userVal - correctVal) < 0.001) {
+             isCorrect = true;
+         }
+    } else {
+        // Legacy behavior: round to 2 decimals (or based on division setting) and compare string
+        // But since I changed input to text, I can't rely on browser number parsing
+        // Let's rely on value comparison with rounding for backward compatibility
+
+        // For division, we have specific decimal places
+        let decimalPlaces = 2; // Default for others?
+        if (currentQ.operation === 'division') {
+             decimalPlaces = parseInt(document.getElementById('divisionDecimalPlace').value);
+        } else {
+            // Addition/Mult/Sub are integers usually, but result could be treated as float
+             decimalPlaces = 2; // Original code used .toFixed(2) for everything
+        }
+
+        // Check if user entered a fraction for a non-fraction question? Allowed?
+        // E.g. 5/1 for 5. Maybe.
+
+        const userFixed = userVal.toFixed(decimalPlaces);
+        const correctFixed = correctVal.toFixed(decimalPlaces);
+
+        if (userFixed === correctFixed) {
+            isCorrect = true;
+        }
+    }
+
+    if (isCorrect) {
         score++;
     } else {
-        const decimalPlace = questions[currentQuestion].operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
-        alert(`Incorrect! The correct answer is ${parseFloat(correctAnswer).toFixed(decimalPlace)}.`);
+        let displayAnswer;
+        if (currentQ.operation === 'fractions' && currentQ.answerDisplay) {
+            displayAnswer = currentQ.answerDisplay;
+        } else {
+            const decimalPlace = currentQ.operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
+            // For integer results (add/sub/mult), we don't want trailing zeros if not needed,
+            // but original code used toFixed(0) essentially?
+            // "parseFloat(correctAnswer).toFixed(decimalPlace)"
+            // If decimalPlace is 0, it rounds to integer.
+            // Wait, original code:
+            // const userAnswer = parseFloat(...).toFixed(2);
+            // const correctAnswer = parseFloat(...).toFixed(2);
+            // alert(correctAnswer.toFixed(decimalPlace));
+
+            // Replicating alert logic:
+             displayAnswer = parseFloat(currentQ.answer).toFixed(decimalPlace);
+
+             // If add/sub/mult, decimalPlace is 0 (from ternary above logic)?
+             // original checkAnswer:
+             // const decimalPlace = questions[currentQuestion].operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
+             // Yes.
+        }
+        alert(`Incorrect! The correct answer is ${displayAnswer}.`);
     }
     currentQuestion++;
     document.getElementById('answer').value = '';
