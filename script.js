@@ -264,22 +264,18 @@ function checkAnswer() {
          if (Math.abs(userVal - correctVal) < 0.001) {
              isCorrect = true;
          }
+    } else if (['addition', 'subtraction', 'multiplication'].includes(currentQ.operation)) {
+        // Strict integer check for integer operations
+        // Allows 3, 3.0 but rejects 3.004
+        if (Math.abs(userVal - correctVal) < Number.EPSILON) {
+            isCorrect = true;
+        }
     } else {
-        // Legacy behavior: round to 2 decimals (or based on division setting) and compare string
-        // But since I changed input to text, I can't rely on browser number parsing
-        // Let's rely on value comparison with rounding for backward compatibility
-
-        // For division, we have specific decimal places
-        let decimalPlaces = 2; // Default for others?
+        // Division: use specific decimal places
+        let decimalPlaces = 2;
         if (currentQ.operation === 'division') {
              decimalPlaces = parseInt(document.getElementById('divisionDecimalPlace').value);
-        } else {
-            // Addition/Mult/Sub are integers usually, but result could be treated as float
-             decimalPlaces = 2; // Original code used .toFixed(2) for everything
         }
-
-        // Check if user entered a fraction for a non-fraction question? Allowed?
-        // E.g. 5/1 for 5. Maybe.
 
         const userFixed = userVal.toFixed(decimalPlaces);
         const correctFixed = correctVal.toFixed(decimalPlaces);
@@ -297,22 +293,7 @@ function checkAnswer() {
             displayAnswer = currentQ.answerDisplay;
         } else {
             const decimalPlace = currentQ.operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
-            // For integer results (add/sub/mult), we don't want trailing zeros if not needed,
-            // but original code used toFixed(0) essentially?
-            // "parseFloat(correctAnswer).toFixed(decimalPlace)"
-            // If decimalPlace is 0, it rounds to integer.
-            // Wait, original code:
-            // const userAnswer = parseFloat(...).toFixed(2);
-            // const correctAnswer = parseFloat(...).toFixed(2);
-            // alert(correctAnswer.toFixed(decimalPlace));
-
-            // Replicating alert logic:
-             displayAnswer = parseFloat(currentQ.answer).toFixed(decimalPlace);
-
-             // If add/sub/mult, decimalPlace is 0 (from ternary above logic)?
-             // original checkAnswer:
-             // const decimalPlace = questions[currentQuestion].operation === 'division' ? parseInt(document.getElementById('divisionDecimalPlace').value) : 0;
-             // Yes.
+            displayAnswer = parseFloat(currentQ.answer).toFixed(decimalPlace);
         }
         alert(`Incorrect! The correct answer is ${displayAnswer}.`);
     }
